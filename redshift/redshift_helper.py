@@ -54,6 +54,9 @@ class RedShiftHelper:
         return data
         
     def mapper_unscraped_linkedin_urls(self, jd_set: dict):
+        if len(dataset) == 0:
+            print('no unscraped url available')
+            return
         query_list = []
         query_header = 'INSERT INTO linkedin_unscraped_urls ( jd_key, url ) VALUES'
         query_list.append(query_header)
@@ -68,6 +71,9 @@ class RedShiftHelper:
         cur.close()
         
     def mapper_linkedin_scraped_data(self, dataset: list):
+        if len(dataset) == 0:
+            print('no scraped data available')
+            return
         query_list = []
         query_header = 'INSERT INTO linkedin_scraped_data ( url, jobtitle, jobdescription, payrange, location, senioritylevel, industry, employmenttype, jobfunction, sizeofcompany, scrapeddate, elaspedperiod ) VALUES'
         query_list.append(query_header)
@@ -99,6 +105,9 @@ class RedShiftHelper:
         cur.close()     
         
     def mapper_known_job_titles(self, job_title_list: list):
+        if len(job_title_list) == 0:
+            print('no job title available')
+            return
         query_list = []
         query_header = 'INSERT INTO known_job_titles ( job_title ) VALUES'
         query_list.append(query_header)
@@ -120,6 +129,9 @@ class RedShiftHelper:
         cur.close()
         
     def mapper_known_skills(self, known_skills_list: list):
+        if len(known_skills_list) == 0:
+            print('no skills available')
+            return
         query_list = []
         query_header = 'INSERT INTO known_skills ( keywords ) VALUES'
         query_list.append(query_header)
@@ -141,6 +153,9 @@ class RedShiftHelper:
         cur.close()
         
     def mapper_ml_job_skill_score(self, ml_job_skill_score: list):
+        if len(known_skills_list) == 0:
+            print('no ml job skills score available')
+            return
         query_list = []
         query_header = 'INSERT INTO ml_job_skill_score ( skill, job_title, relevance_score ) VALUES'
         query_list.append(query_header)
@@ -162,6 +177,9 @@ class RedShiftHelper:
         cur.close()
         
     def mapper_ml_job_score(self, ml_job_score: list):
+        if len(ml_job_score) == 0:
+            print('no ml job score available')
+            return
         query_list = []
         query_header = 'INSERT INTO ml_job_score ( job_title, total_score ) VALUES'
         query_list.append(query_header)
@@ -183,6 +201,9 @@ class RedShiftHelper:
         cur.close()
         
     def mapper_ml_job_info(self, ml_job_info: list):
+        if len(ml_job_info) == 0:
+            print('no ml job info available')
+            return
         query_list = []
         query_header = 'INSERT INTO ml_job_info ( job_title, pay, opportunity, pay_score, opportunity_score ) VALUES'
         query_list.append(query_header)
@@ -195,3 +216,4 @@ class RedShiftHelper:
         cur.execute(complete_query)
         self.con.commit()
         cur.close()
+         
