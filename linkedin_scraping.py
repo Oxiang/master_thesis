@@ -19,7 +19,7 @@ RATE_LIMIT = 0.3
 '''
 Set Logging
 '''
-logging.basicConfig(filename='linkedin_scrape.log', filemode='w',format='%(asctime)s - %(message)s', level=logging.INFO)
+logging.basicConfig(filename='logs/linkedin_scrape.log', filemode='w',format='%(asctime)s - %(message)s', level=logging.INFO)
 now = datetime.now()
 logging.info('Starting script on {}'.format(now.strftime("%m/%d/%Y, %H:%M:%S")))
 
