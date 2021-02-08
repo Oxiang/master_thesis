@@ -25,4 +25,4 @@ print('Pulled unscraped urls', len(unscraped_urls))
 # Test pulling scraped data
 
 existing_data = rsh.get_scraped_linkedin_urls()
-print('Pulled scraped urls'm len(existing_data))
+print('Pulled scraped urls', len(existing_data))
