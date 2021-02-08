@@ -3,7 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 import re
-from datetime import date
+from datetime import date, datetime
 from tqdm import tqdm
 from redshift import redshift_helper
 import time

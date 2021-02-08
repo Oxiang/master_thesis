@@ -54,7 +54,7 @@ class RedShiftHelper:
         return data
         
     def mapper_unscraped_linkedin_urls(self, jd_set: dict):
-        if len(dataset) == 0:
+        if len(jd_set) == 0:
             print('no unscraped url available')
             return
         query_list = []
