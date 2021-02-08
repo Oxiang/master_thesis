@@ -8,6 +8,7 @@ from tqdm import tqdm
 from redshift import redshift_helper
 import time
 import numpy as np
+import psutil
 print('Imported all modules')
 
 MAX_SCRAPE = 1000
@@ -26,3 +27,8 @@ print('Pulled unscraped urls', len(unscraped_urls))
 
 existing_data = rsh.get_scraped_linkedin_urls()
 print('Pulled scraped urls', len(existing_data))
+
+
+# Check PSUTIL
+print("CPU: {}".format(psutil.cpu_percent()))
+print("RAM: {}".format(psutil.virtual_memory().percent))
