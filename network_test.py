@@ -9,26 +9,33 @@ from redshift import redshift_helper
 import time
 import numpy as np
 import psutil
+print('Running network test')
 print('Imported all modules')
 
-MAX_SCRAPE = 1000
-
 # Test connecting to database
-
 rsh = redshift_helper.RedShiftHelper()
-print('Conencted to redshift')
+print('Connected to redshift')
 
-# Test pulling unscraped data
-
-unscraped_urls = rsh.get_unscraped_linkedin_urls(MAX_SCRAPE)
-print('Pulled unscraped urls', len(unscraped_urls))
-
-# Test pulling scraped data
+unscraped_urls = rsh.get_all_unscraped_linkedin_urls()
+print('Pulled linkedin unscraped urls:', len(unscraped_urls))
 
 existing_data = rsh.get_scraped_linkedin_urls()
-print('Pulled scraped urls', len(existing_data))
+print('Pulled linkedin scraped urls:', len(existing_data))
 
+existing_data = rsh.get_all_unscraped_glassdoor_urls_keys()
+print('Pulled glassdoor unscraped urls:', len(existing_data))
+
+existing_data = rsh.get_all_scraped_glassdoor_urls()
+print('Pulled glassdoor scraped urls:', len(existing_data))
+
+existing_data = rsh.get_all_unscraped_mcf_urls_keys()
+print('Pulled mycareersfuture unscraped urls:', len(existing_data))
+
+existing_data = rsh.get_all_scraped_mcf_urls_key()
+print('Pulled mycareersfuture scraped urls:', len(existing_data))
 
 # Check PSUTIL
 print("CPU: {}".format(psutil.cpu_percent()))
 print("RAM: {}".format(psutil.virtual_memory().percent))
+
+rsh.redshift_quit()
