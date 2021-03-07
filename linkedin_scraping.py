@@ -12,9 +12,10 @@ import logging
 import psutil
 from selenium.webdriver.chrome.options import Options
 
-MAX_SCRAPE = 10
+MAX_SCRAPE = 500
 TIMEOUT = 30
-RATE_LIMIT = 0.3
+RATE_LIMIT = 1
+SKIP_RATE = 3
 
 '''
 Set Logging
@@ -157,7 +158,9 @@ for url in tqdm(unscraped_list):
             pass
     except Exception as e:
         logging.exception("Error with {} | CPU: {} | RAM: {}".format(e, psutil.cpu_percent(), psutil.virtual_memory().percent))
-        raise Exception("Error with {}".format(e))
+        # raise Exception("Error with {}".format(e))
+        # If an error occur, move to next page after SKIP_RATE seconds
+        time.sleep(SKIP_RATE)
     
 driver.quit()
 
@@ -201,8 +204,8 @@ parsed_scraped_data.replace("'", '', regex=True, inplace=True)
 parsed_scraped_data.replace(np.nan, '', regex=True, inplace=True)
 scraped_data_list = parsed_scraped_data.to_numpy().tolist()
         
-logging.info('Pushing scraped data to redshift linkedin_scraped_data')
-print('Pushing scraped data to redshift linkedin_scraped_data')
+logging.info('Pushing scraped data to redshift linkedin_scraped_data. New data {}'.format(len(scraped_data_list)))
+print('Pushing scraped data to redshift linkedin_scraped_data. New data {}'.format(len(scraped_data_list)))
 
 # Push everything to redshift under unscraped_linkedin_urls table
 try:

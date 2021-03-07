@@ -4,6 +4,7 @@ import time
 import pandas as pd
 from tqdm import tqdm
 import random
+from redshift import redshift_helper
 
 # Search Url
 search_url = 'https://www.linkedin.com/jobs'
@@ -15,10 +16,11 @@ known_job_titles_list = known_job_titles_table['job_title'].tolist()
 # Seed list
 seed_set = set()
 
+driver = webdriver.Chrome(r"C:\chromedriver.exe")
+
 for title in tqdm(known_job_titles_list):
     try:
         # Initiate search
-        driver = webdriver.Chrome(r"C:\chromedriver.exe")
         driver.get(search_url)
         job_search_bar = driver.find_element_by_xpath('//*[@id="JOBS"]/section[1]/input')
         job_search_bar.clear()
@@ -44,23 +46,38 @@ for title in tqdm(known_job_titles_list):
         driver.quit()
     except Exception as e:
         print('Error occurred when searching for {}, {}'.format(title,e))
-    driver.quit()
+
+driver.quit()
 # Randomize
 seed_list = list(seed_set)
 random.shuffle(seed_list)
 
-# Duplicate filter before saving
-# We can filter out string after linkedin.com/jobs/view/ THIS THIS THIS ? ...
-# E.g. We can extract scientist-3-month-contract-at-a-star-agency-for-science-technology-and-research-2335113979
-# from https://sg.linkedin.com/jobs/view/scientist-3-month-contract-at-a-star-agency-for-science-technology-and-research-2335113979?refId=44ec646e-345f-4c85-a339-df8830cc0d9c&trackingId=%2FeOErzvp7C05gKb%2BSeu%2BcQ%3D%3D&position=4&pageNum=0&trk=public_jobs_job-result-card_result-card_full-click
+rsh = redshift_helper.RedShiftHelper()
+existing_scrape_key = rsh.get_scraped_linkedin_urls()
+exisiting_unscraped_key = rsh.get_all_unscraped_linkedin_urls()
+
+# turn to set
+exisiting_unscraped_key_set = set([str(k[0]) for k in exisiting_unscraped_key])
+existing_scrape_key_set = set([str(k[0]) for k in existing_scrape_key])
+
+# remove duplicates and remove url with more than 256 characters
 duplicate_removal = {}
 for n_url in seed_list:
     key = n_url.split("?")[0].split("/")[-1]
-    if key not in duplicate_removal:
-        duplicate_removal[key] = n_url
+    cut_url = n_url.split("&")[0]
+    if key not in duplicate_removal and key not in existing_scrape_key_set and key not in exisiting_unscraped_key_set:
+        if len(cut_url) <= 256 and len(key) <= 256:
+            duplicate_removal[key] = cut_url
 
-no_duplicate_new_urls = list(duplicate_removal.values())
-
-# Export to csv
-export_data = pd.DataFrame(no_duplicate_new_urls, columns=['urls'])
-export_data.to_csv('unscrapped_linkedin_url.csv')
+# push to redshift
+print('Scraped {} seed links from linkedin'.format(len(duplicate_removal)))
+try:
+    rsh.mapper_unscraped_linkedin_urls(duplicate_removal)
+    rsh.redshift_quit()
+    print('Successfully pushed linkedin seed links to redshift')
+except Exception as e:
+    today = date.today().strftime("%Y-%m-%d")
+    seed_df = pd.DataFrame([[k,v] for k,v in duplicate_removal.items()], columns = ['jd_key', 'url'])
+    seed_df.to_csv('tmp/linkedin_seed_{}.csv'.format(today))
+    print('Error in linkedin seeding due to {} on {}. Saving in tmp folder'.format(e, today))
+    
